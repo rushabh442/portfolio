@@ -52,7 +52,8 @@ const AdminDashboard = ({ onLogout }) => {
     social_linkedin: '',
     social_instagram: '',
     social_whatsapp: '',
-    social_glow_color: ''
+    social_glow_color: '',
+    resume_url: ''
   });
 
   // Database collections
@@ -136,7 +137,8 @@ const AdminDashboard = ({ onLogout }) => {
           social_linkedin: 'https://linkedin.com',
           social_instagram: 'https://instagram.com',
           social_whatsapp: 'https://wa.me/911234567890',
-          social_glow_color: '#a855f7'
+          social_glow_color: '#a855f7',
+          resume_url: '#'
         };
 
         let updated = false;
@@ -726,6 +728,16 @@ const AdminDashboard = ({ onLogout }) => {
                         type="text" 
                         value={config.hero_badge_text} 
                         onChange={(e) => setConfig({...config, hero_badge_text: e.target.value})} 
+                        className="form-input" 
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>Resume Link / URL (e.g. Google Drive link or Supabase Storage file URL)</label>
+                      <input 
+                        type="text" 
+                        value={config.resume_url || ''} 
+                        onChange={(e) => setConfig({...config, resume_url: e.target.value})} 
                         className="form-input" 
                       />
                     </div>

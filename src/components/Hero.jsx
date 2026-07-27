@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, MessageSquare, Github, Linkedin, Instagram, MessageCircle, Mail, Sparkles, Code2 } from 'lucide-react';
+import { ArrowRight, MessageSquare, Github, Linkedin, Instagram, MessageCircle, Mail, Sparkles, Code2, FileText } from 'lucide-react';
 
 const Hero = ({ config = {} }) => {
   const formatHeroTitle = (title) => {
@@ -58,6 +58,15 @@ const Hero = ({ config = {} }) => {
             </a>
             <a href="#contact" className="btn btn-secondary" style={{ gap: '0.65rem' }}>
               <MessageSquare size={16} /> Let's Talk
+            </a>
+            <a 
+              href={config.resume_url || "#"} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="btn btn-secondary" 
+              style={{ gap: '0.65rem' }}
+            >
+              <FileText size={16} /> Resume
             </a>
           </div>
 
