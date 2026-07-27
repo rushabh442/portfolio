@@ -13,6 +13,7 @@ const AdminDashboard = ({ onLogout }) => {
   const [seedingServices, setSeedingServices] = useState(false);
   const [seedingExp, setSeedingExp] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadingResume, setUploadingResume] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
 
   // Grouped configuration state
@@ -306,6 +307,57 @@ const AdminDashboard = ({ onLogout }) => {
       showMessage("Upload failed. Make sure a public bucket named 'portfolio-assets' exists in Supabase Storage.", "error");
     } finally {
       setUploadingImage(false);
+    }
+  };
+
+  const handleResumeUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await uploadResumeToStorage(file);
+  };
+
+  const handleResumeDrop = async (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+    await uploadResumeToStorage(file);
+  };
+
+  const uploadResumeToStorage = async (file) => {
+    if (!supabase) return;
+    
+    if (file.type !== 'application/pdf') {
+      showMessage("Please upload a PDF document.", "error");
+      return;
+    }
+
+    setUploadingResume(true);
+    try {
+      const fileName = `resume-${Date.now()}.pdf`;
+      const filePath = `resumes/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('portfolio-assets')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data } = supabase.storage
+        .from('portfolio-assets')
+        .getPublicUrl(filePath);
+
+      setConfig(prev => ({ ...prev, resume_url: data.publicUrl }));
+      showMessage("Resume PDF uploaded successfully.");
+    } catch (err) {
+      console.error("Resume upload error:", err);
+      showMessage("Upload failed. Check your Supabase storage permissions.", "error");
+    } finally {
+      setUploadingResume(false);
     }
   };
 
@@ -732,14 +784,51 @@ const AdminDashboard = ({ onLogout }) => {
                       />
                     </div>
 
-                    <div className="form-group">
-                      <label>Resume Link / URL (e.g. Google Drive link or Supabase Storage file URL)</label>
-                      <input 
-                        type="text" 
-                        value={config.resume_url || ''} 
-                        onChange={(e) => setConfig({...config, resume_url: e.target.value})} 
-                        className="form-input" 
-                      />
+                    <div className="form-group" style={{ marginTop: '1rem' }}>
+                      <label>Resume Document (PDF)</label>
+                      {(config.resume_url && config.resume_url !== '#' && config.resume_url !== '') ? (
+                        <div className="admin-image-preview-container glass-panel">
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-blue)' }}>
+                            <FileText size={20} />
+                            <a href={config.resume_url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-primary)', textDecoration: 'underline', fontSize: '0.9rem' }}>
+                              View Uploaded Resume PDF
+                            </a>
+                          </div>
+                          <button 
+                            type="button" 
+                            onClick={() => setConfig(prev => ({ ...prev, resume_url: '#' }))} 
+                            className="btn btn-secondary remove-img-btn"
+                          >
+                            <X size={14} /> Remove Resume
+                          </button>
+                        </div>
+                      ) : (
+                        <div 
+                          className={`admin-drag-drop-zone glass-panel ${uploadingResume ? 'uploading' : ''}`}
+                          onDragOver={(e) => e.preventDefault()}
+                          onDrop={handleResumeDrop}
+                          style={{ padding: '1.75rem 1rem' }}
+                        >
+                          <input 
+                            type="file" 
+                            id="resume-upload-input" 
+                            accept="application/pdf" 
+                            onChange={handleResumeUpload} 
+                            style={{ display: 'none' }} 
+                          />
+                          <label htmlFor="resume-upload-input" className="upload-label-trigger">
+                            {uploadingResume ? (
+                              <span className="upload-spinner">Uploading PDF...</span>
+                            ) : (
+                              <>
+                                <Plus size={20} style={{ color: 'var(--accent-blue)', marginBottom: '0.5rem' }} />
+                                <span>Drag & drop resume PDF here, or <strong>click to browse</strong></span>
+                                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>Supports PDF only</span>
+                              </>
+                            )}
+                          </label>
+                        </div>
+                      )}
                     </div>
                   </div>
 
