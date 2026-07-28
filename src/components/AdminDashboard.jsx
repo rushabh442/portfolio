@@ -351,6 +351,13 @@ const AdminDashboard = ({ onLogout }) => {
         .from('portfolio-assets')
         .getPublicUrl(filePath);
 
+      // Save directly to database config
+      const { error: dbError } = await supabase
+        .from('portfolio_config')
+        .upsert({ key: 'resume_url', value: data.publicUrl });
+      
+      if (dbError) throw dbError;
+
       setConfig(prev => ({ ...prev, resume_url: data.publicUrl }));
       showMessage("Resume PDF uploaded successfully.");
     } catch (err) {
@@ -796,7 +803,15 @@ const AdminDashboard = ({ onLogout }) => {
                           </div>
                           <button 
                             type="button" 
-                            onClick={() => setConfig(prev => ({ ...prev, resume_url: '#' }))} 
+                            onClick={async () => {
+                              setConfig(prev => ({ ...prev, resume_url: '#' }));
+                              if (supabase) {
+                                await supabase
+                                  .from('portfolio_config')
+                                  .upsert({ key: 'resume_url', value: '#' });
+                              }
+                              showMessage("Resume removed successfully.");
+                            }} 
                             className="btn btn-secondary remove-img-btn"
                           >
                             <X size={14} /> Remove Resume
