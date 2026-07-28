@@ -102,6 +102,16 @@ function App() {
           configMap[item.key] = item.value;
         });
         setConfig(configMap);
+
+        // Dynamically update document title and description for SEO
+        const brandName = configMap.brand_name || 'Rushya';
+        const brandSubtitle = configMap.brand_subtitle || 'Full Stack Developer';
+        document.title = `${brandName} | ${brandSubtitle}`;
+        
+        const metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc && configMap.hero_subtitle) {
+          metaDesc.setAttribute('content', configMap.hero_subtitle);
+        }
       } catch (err) {
         console.error("Error loading configs from Supabase:", err);
       }
