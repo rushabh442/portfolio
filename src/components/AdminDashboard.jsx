@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import { 
-  LogOut, Settings, Briefcase, Cpu, Award, Inbox, Plus, Trash, Edit, Save, X, Sparkles, Check, Database 
+  LogOut, Settings, Briefcase, Cpu, Award, Inbox, Plus, Trash, Edit, Save, X, Sparkles, Check, Database, FileText 
 } from 'lucide-react';
 
 const AdminDashboard = ({ onLogout }) => {
