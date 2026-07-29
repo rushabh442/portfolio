@@ -1295,6 +1295,11 @@ a.contact-detail-value:hover {
   padding-right: 2.5rem;
 }
 
+.form-select option {
+  background-color: #0d0d17; /* Match the dark premium theme */
+  color: #ffffff; /* High contrast text visibility */
+}
+
 .form-input.text-area {
   resize: vertical;
 }
